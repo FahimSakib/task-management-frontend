@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import SideNav from "../components/SideNav";
 import Header from "../components/Header";
 
-const Layout = ({ loggedIn, setLoggedIn }) => {
+const Layout = ({ setLoggedIn }) => {
     const [sideNavShow, setSideNavShow] = useState(true)
 
     return (
