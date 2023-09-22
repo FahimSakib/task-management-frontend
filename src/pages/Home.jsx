@@ -46,7 +46,7 @@ export default function Home({ loggedIn }) {
             <td className="px-6 py-4">{task.users.map((user) => user.name).join(', ')}</td>
             <td className="px-6 py-4 flex gap-2">
                 <Link to={`/view-task/${task.id}`}><EyeIcon /></Link>
-                {task.users.some(user => user.id === loggedUserId) ? editAndDelete(task.id) : (task.created_by === loggedUserId && editAndDelete(task.id))}
+                {(task.users.some(user => user.id === loggedUserId) || task.created_by === loggedUserId) && editAndDelete(task.id)}
             </td>
         </tr>
     ))
