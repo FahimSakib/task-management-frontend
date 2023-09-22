@@ -8,6 +8,8 @@ import { useState } from 'react';
 import axios from 'axios';
 import CreateTask from './pages/CreateTask';
 import ViewTask from './pages/ViewTask';
+import EditTask from './pages/EditTask';
+import AccessDenied from './pages/AccessDenied';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(
@@ -30,9 +32,11 @@ function App() {
           <Route index element={<Home loggedIn={loggedIn} />} />
           <Route path="/create-task" element={<CreateTask loggedIn={loggedIn} />} />
           <Route path="/view-task/:id" element={<ViewTask loggedIn={loggedIn} />} />
+          <Route path="/edit-task/:id" element={<EditTask loggedIn={loggedIn} />} />
         </Route>
         <Route path="/login" element={<Login setSessionLogin={setSessionLogin} />} />
         <Route path="/register" element={<Register setSessionLogin={setSessionLogin} />} />
+        <Route path="/access-denied" element={<AccessDenied />} />
       </Routes>
     </BrowserRouter>
   );

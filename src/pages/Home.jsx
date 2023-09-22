@@ -30,17 +30,23 @@ export default function Home({ loggedIn }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    const editAndDelete = (id) => (
+        <div className="flex gap-2">
+            <Link to={`/edit-task/${id}`}>
+                <PencilSquareIcon />
+            </Link>
+            <TrashIcon />
+        </div>
+    )
+
     const rows = tasks.map(task => (
         <tr className="bg-white border-b" key={task.id}>
             <td className="px-6 py-4">{task.name}</td>
             <td className="px-6 py-4">{task.description}</td>
             <td className="px-6 py-4">{task.users.map((user) => user.name).join(', ')}</td>
             <td className="px-6 py-4 flex gap-2">
-                <Link to={`/view-task/${task.id}`}>
-
-                    <EyeIcon />
-                </Link>
-                {task.users.some(user => user.id === loggedUserId) ? <div className="flex gap-2"><PencilSquareIcon /> <TrashIcon /></div> : (task.created_by === loggedUserId && <div className="flex gap-2"><PencilSquareIcon /> <TrashIcon /></div>)}
+                <Link to={`/view-task/${task.id}`}><EyeIcon /></Link>
+                {task.users.some(user => user.id === loggedUserId) ? editAndDelete(task.id) : (task.created_by === loggedUserId && editAndDelete(task.id))}
             </td>
         </tr>
     ))
