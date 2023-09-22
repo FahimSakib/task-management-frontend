@@ -7,11 +7,9 @@ import axios from 'axios'
 const CreateTask = ({ loggedIn }) => {
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
-    const [assignedUser, setAssignedUser] = useState('')
+    const [assignedUsers, setAssignedUsers] = useState('')
     const [errors, setErrors] = useState({})
     const [users, setUsers] = useState([])
-
-    console.log(name, description, assignedUser)
 
     useEffect(() => {
         if (loggedIn) {
@@ -31,18 +29,16 @@ const CreateTask = ({ loggedIn }) => {
         value: user.id.toString()
     }))
 
-    // console.log(userOptions)
-
     const handleSubmit = (e) => {
         e.preventDefault();
         setErrors({})
-        axios.post('/api/store-task', { name, description, assignedUser }).then(response => {
+        axios.post('/api/store-task', { name, description, assignedUsers }).then(response => {
             console.log(response)
             console.log(response.data.success)
             if (response.status === 200 && response.data.success === true) {
                 setName('')
                 setDescription('')
-                setAssignedUser('')
+                setAssignedUsers('')
                 console.log(response.data.msg)
             } else {
                 console.log(response.data.msg)
@@ -109,11 +105,11 @@ const CreateTask = ({ loggedIn }) => {
                     </label>
                     <MultiSelect
                         name="user_assign"
-                        defaultValue={assignedUser}
+                        defaultValue={assignedUsers}
                         placeholder="Assign users"
                         style={{ width: '100%' }}
                         options={userOptions}
-                        onChange={value => setAssignedUser(value)}
+                        onChange={value => setAssignedUsers(value)}
                     />
                 </div>
                 <button
