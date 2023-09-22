@@ -3,6 +3,7 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import MultiSelect from 'react-multiple-select-dropdown-lite'
 import 'react-multiple-select-dropdown-lite/dist/index.css'
 import axios from 'axios'
+import toast from 'react-hot-toast'
 
 const EditTask = ({ loggedIn }) => {
     const { id } = useParams()
@@ -52,9 +53,9 @@ const EditTask = ({ loggedIn }) => {
         setErrors({})
         axios.put(`/api/update-task/${id}`, { name, description, assignedUsers }).then(response => {
             if (response.status === 200 && response.data.success === true) {
-                console.log(response.data.msg)
+                toast.success(response.data.msg)
             } else {
-                console.log(response.data.msg)
+                toast.error(response.data.msg)
             }
         }).catch(err => {
             if (err.response.status === 422) {

@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom'
 import MultiSelect from 'react-multiple-select-dropdown-lite'
 import 'react-multiple-select-dropdown-lite/dist/index.css'
 import axios from 'axios'
+import toast from 'react-hot-toast'
 
 const CreateTask = ({ loggedIn }) => {
     const [name, setName] = useState('')
@@ -33,15 +34,13 @@ const CreateTask = ({ loggedIn }) => {
         e.preventDefault();
         setErrors({})
         axios.post('/api/store-task', { name, description, assignedUsers }).then(response => {
-            console.log(response)
-            console.log(response.data.success)
             if (response.status === 200 && response.data.success === true) {
                 setName('')
                 setDescription('')
                 setAssignedUsers('')
-                console.log(response.data.msg)
+                toast.success(response.data.msg)
             } else {
-                console.log(response.data.msg)
+                toast.error(response.data.msg)
             }
         }).catch(err => {
             if (err.response.status === 422) {
