@@ -13,19 +13,18 @@ export default function Home({ loggedIn }) {
     const [loading, setLoading] = useState(false)
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [idForDelete, setIdForDelete] = useState('')
-    // console.log(tasks, loggedUserId)
-    // console.log(idForDelete)
+    const [currentPage, setCurrentPage] = useState(1)
 
     useEffect(() => {
         if (loggedIn) {
             fetchTasks()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [currentPage])
 
     const fetchTasks = () => {
         setLoading(true)
-        axios.get('/api/tasks')
+        axios.get(`/api/tasks?page=${currentPage}`)
             .then(response => {
                 if (response.status === 200) {
                     setTasks(response.data.tasks)
@@ -50,7 +49,7 @@ export default function Home({ loggedIn }) {
         </div>
     )
 
-    const rows = tasks.map(task => (
+    const rows = tasks?.data?.map(task => (
         <tr className="bg-white border-b" key={task.id}>
             <td className="px-6 py-4">{task.name}</td>
             <td className="px-6 py-4">{task.description}</td>
@@ -81,6 +80,14 @@ export default function Home({ loggedIn }) {
         })
     }
 
+    const handlePagination = (url) => {
+        const matches = url.match(/page=(\d+)/)
+
+        if (matches) {
+            setCurrentPage(matches[1])
+        }
+    }
+
     if (!loggedIn) {
         return <Navigate to='/login' />
     }
@@ -106,7 +113,7 @@ export default function Home({ loggedIn }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {rows.length ? rows : <tr className="bg-white border-b">
+                        {rows?.length ? rows : <tr className="bg-white border-b">
                             <td className="px-6 py-4 text-center" colSpan={4}>
                                 {loading ? 'Loading...' : 'No data found!'}
                             </td>
@@ -114,6 +121,18 @@ export default function Home({ loggedIn }) {
                     </tbody>
                 </table>
             </div>
+            {tasks?.links &&
+                <div className="mt-5 ml-5">
+                    {tasks?.links?.map(link => (
+                        <button
+                            className={`mr-3 px-3 py-2 rounded-lg ${link.active ? 'bg-violet-600 pointer-events-none' : 'bg-violet-200'} ${!link.url ? 'pointer-events-none	opacity-50' : ''}`}
+                            key={link.label}
+                            dangerouslySetInnerHTML={{ __html: link.label }}
+                            onClick={() => handlePagination(link.url)}
+                        />
+                    ))}
+                </div>
+            }
             {showDeleteModal && <DeleteConfirmModal setShowDeleteModal={setShowDeleteModal} deleteTask={deleteTask} setIdForDelete={setIdForDelete} />}
         </div>
     )
