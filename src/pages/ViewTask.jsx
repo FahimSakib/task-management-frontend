@@ -11,14 +11,11 @@ const ViewTask = ({ loggedIn }) => {
     const [errors, setErrors] = useState({})
     const [comment, setComment] = useState('')
 
-    // console.log(currentUserId)
-
     useEffect(() => {
         if (loggedIn) {
             setLoading(true)
             axios.get(`/api/view-task/${id}`)
                 .then(response => {
-                    // console.log(response)
                     if (response.status === 200) {
                         setTask(response.data.task)
                         setCurrentUserId(response.data.currentUserId)
@@ -39,8 +36,6 @@ const ViewTask = ({ loggedIn }) => {
             <p className="ml-3">{comment.comment}</p>
         </div>
     ))
-
-    // console.log(showComments)
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -91,31 +86,37 @@ const ViewTask = ({ loggedIn }) => {
                     <hr />
                     <h4 className="mt-3 font-bold">Comments({task?.comments?.length})</h4>
                     {showComments}
-                    <form className="space-y-4 md:space-y-6 mt-3" onSubmit={handleSubmit}>
-                        <div>
-                            <label
-                                htmlFor="comment"
-                                className="block mb-2 text-sm font-medium text-gray-900"
+                    {(task?.users?.some(user => user.id === currentUserId) || task.created_by === currentUserId) ?
+                        <form className="space-y-4 md:space-y-6 mt-3" onSubmit={handleSubmit}>
+                            <div>
+                                <label
+                                    htmlFor="comment"
+                                    className="block mb-2 text-sm font-medium text-gray-900"
+                                >
+                                    Add comment
+                                </label>
+                                <textarea
+                                    id="comment"
+                                    rows={4}
+                                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Comment..."
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
+                                />
+                                {errors?.comment && <p className="text-xs text-red-600 mt-1 ml-2">{errors?.comment[0]}</p>}
+                            </div>
+                            <button
+                                type="submit"
+                                className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             >
-                                Add comment
-                            </label>
-                            <textarea
-                                id="comment"
-                                rows={4}
-                                className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Comment..."
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
-                            />
-                            {errors?.comment && <p className="text-xs text-red-600 mt-1 ml-2">{errors?.comment[0]}</p>}
-                        </div>
-                        <button
-                            type="submit"
-                            className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                        >
-                            Comment
-                        </button>
-                    </form>
+                                Comment
+                            </button>
+                        </form>
+                        :
+                        <p className="mt-3">
+                            Only the creator of the task or the assigned users can add comment!
+                        </p>
+                    }
                 </div>
             }
         </div>
