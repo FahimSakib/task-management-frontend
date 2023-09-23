@@ -41,7 +41,6 @@ const ViewTask = ({ loggedIn }) => {
         e.preventDefault();
         setErrors({})
         axios.post('/api/add-comment', { comment, user_id: currentUserId, task_id: task.id }).then(response => {
-            console.log(response)
             if (response.status === 200 && response.data.success === true) {
                 setComment('')
                 setTask(response.data.data)

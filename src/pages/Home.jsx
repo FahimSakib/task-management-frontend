@@ -4,38 +4,49 @@ import { Link, Navigate } from "react-router-dom"
 import EyeIcon from "../components/icons/EyeIcon"
 import PencilSquareIcon from "../components/icons/PencilSquareIcon"
 import TrashIcon from "../components/icons/TrashIcon"
+import DeleteConfirmModal from "../components/DeleteConfirmModal"
+import toast from "react-hot-toast"
 
 export default function Home({ loggedIn }) {
     const [tasks, setTasks] = useState([])
     const [loggedUserId, setLoggedUserId] = useState('')
     const [loading, setLoading] = useState(false)
-    console.log(tasks, loggedUserId)
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [idForDelete, setIdForDelete] = useState('')
+    // console.log(tasks, loggedUserId)
+    // console.log(idForDelete)
 
     useEffect(() => {
         if (loggedIn) {
-            setLoading(true)
-            axios.get('/api/tasks')
-                .then(response => {
-                    if (response.status === 200) {
-                        setTasks(response.data.tasks)
-                        setLoggedUserId(response.data.loggedUserId)
-                    }
-                    setLoading(false)
-                })
-                .catch(err => {
-                    setLoading(false)
-                    console.log(err)
-                })
+            fetchTasks()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    const fetchTasks = () => {
+        setLoading(true)
+        axios.get('/api/tasks')
+            .then(response => {
+                if (response.status === 200) {
+                    setTasks(response.data.tasks)
+                    setLoggedUserId(response.data.loggedUserId)
+                }
+                setLoading(false)
+            })
+            .catch(err => {
+                setLoading(false)
+                console.log(err)
+            })
+    }
 
     const editAndDelete = (id) => (
         <div className="flex gap-2">
             <Link to={`/edit-task/${id}`}>
                 <PencilSquareIcon />
             </Link>
-            <TrashIcon />
+            <button onClick={() => { setShowDeleteModal(true); setIdForDelete(id) }}>
+                <TrashIcon />
+            </button>
         </div>
     )
 
@@ -51,13 +62,31 @@ export default function Home({ loggedIn }) {
         </tr>
     ))
 
+    const deleteTask = () => {
+        if (!idForDelete) {
+            return
+        }
+
+        axios.delete(`/api/delete-task/${idForDelete}`).then(response => {
+            if (response.status === 200 && response.data.success === true) {
+                fetchTasks()
+                setShowDeleteModal(false)
+                toast.success(response.data.msg)
+            } else {
+                toast.error(response.data.msg)
+            }
+        }).catch(err => {
+            toast.error('Someting went wrong!')
+            console.log(err)
+        })
+    }
+
     if (!loggedIn) {
         return <Navigate to='/login' />
     }
 
     return (
         <div>
-
             <div className="relative overflow-x-auto">
                 <table className="w-full text-sm text-left text-gray-500">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-100">
@@ -77,21 +106,15 @@ export default function Home({ loggedIn }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ?
-                            <tr className="bg-white border-b">
-                                <td className="px-6 py-4 text-center" colSpan={4}>
-                                    Loading..
-                                </td>
-                            </tr> :
-                            rows.length ? rows : <tr className="bg-white border-b">
-                                <td className="px-6 py-4 text-center" colSpan={4}>
-                                    No data found!
-                                </td>
-                            </tr>
-                        }
+                        {rows.length ? rows : <tr className="bg-white border-b">
+                            <td className="px-6 py-4 text-center" colSpan={4}>
+                                {loading ? 'Loading...' : 'No data found!'}
+                            </td>
+                        </tr>}
                     </tbody>
                 </table>
             </div>
+            {showDeleteModal && <DeleteConfirmModal setShowDeleteModal={setShowDeleteModal} deleteTask={deleteTask} setIdForDelete={setIdForDelete} />}
         </div>
     )
 }
