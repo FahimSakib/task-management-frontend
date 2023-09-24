@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Navigate, useParams } from 'react-router-dom'
+import Spiner from '../components/Spiner'
 
 const ViewTask = ({ loggedIn }) => {
     const { id } = useParams()
@@ -10,6 +11,7 @@ const ViewTask = ({ loggedIn }) => {
     const [currentUserId, setCurrentUserId] = useState('')
     const [errors, setErrors] = useState({})
     const [comment, setComment] = useState('')
+    const [submitLoading, setSubmitLoading] = useState(false)
 
     useEffect(() => {
         if (loggedIn) {
@@ -40,17 +42,20 @@ const ViewTask = ({ loggedIn }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         setErrors({})
+        setSubmitLoading(true)
         axios.post('/api/add-comment', { comment, user_id: currentUserId, task_id: task.id }).then(response => {
             if (response.status === 200 && response.data.success === true) {
                 setComment('')
                 setTask(response.data.data)
                 toast.success(response.data.msg)
             }
+            setSubmitLoading(false)
         }).catch(err => {
             if (err.response.status === 422) {
                 setErrors(err.response.data.errors)
             }
             console.log(err)
+            setSubmitLoading(false)
         })
     }
 
@@ -106,9 +111,9 @@ const ViewTask = ({ loggedIn }) => {
                             </div>
                             <button
                                 type="submit"
-                                className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                                className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center flex items-center"
                             >
-                                Comment
+                                {submitLoading && <Spiner height="4" width="4" />}Comment
                             </button>
                         </form>
                         :

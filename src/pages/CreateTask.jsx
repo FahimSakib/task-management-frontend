@@ -4,6 +4,7 @@ import MultiSelect from 'react-multiple-select-dropdown-lite'
 import 'react-multiple-select-dropdown-lite/dist/index.css'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import Spiner from '../components/Spiner'
 
 const CreateTask = ({ loggedIn }) => {
     const [name, setName] = useState('')
@@ -11,6 +12,7 @@ const CreateTask = ({ loggedIn }) => {
     const [assignedUsers, setAssignedUsers] = useState('')
     const [errors, setErrors] = useState({})
     const [users, setUsers] = useState([])
+    const [submitLoading, setSubmitLoading] = useState(false)
 
     useEffect(() => {
         if (loggedIn) {
@@ -33,6 +35,7 @@ const CreateTask = ({ loggedIn }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         setErrors({})
+        setSubmitLoading(true)
         axios.post('/api/store-task', { name, description, assignedUsers }).then(response => {
             if (response.status === 200 && response.data.success === true) {
                 setName('')
@@ -42,11 +45,13 @@ const CreateTask = ({ loggedIn }) => {
             } else {
                 toast.error(response.data.msg)
             }
+            setSubmitLoading(false)
         }).catch(err => {
             if (err.response.status === 422) {
                 setErrors(err.response.data.errors)
             }
             console.log(err)
+            setSubmitLoading(false)
         })
     }
 
@@ -113,9 +118,9 @@ const CreateTask = ({ loggedIn }) => {
                 </div>
                 <button
                     type="submit"
-                    className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                    className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center flex items-center"
                 >
-                    Create
+                    {submitLoading && <Spiner height="4" width="4" />}Create
                 </button>
             </form>
         </div>

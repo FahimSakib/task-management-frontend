@@ -4,6 +4,7 @@ import MultiSelect from 'react-multiple-select-dropdown-lite'
 import 'react-multiple-select-dropdown-lite/dist/index.css'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import Spiner from '../components/Spiner'
 
 const EditTask = ({ loggedIn }) => {
     const { id } = useParams()
@@ -14,6 +15,7 @@ const EditTask = ({ loggedIn }) => {
     const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState({})
     const [users, setUsers] = useState([])
+    const [submitLoading, setSubmitLoading] = useState(false)
 
 
     useEffect(() => {
@@ -51,17 +53,20 @@ const EditTask = ({ loggedIn }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         setErrors({})
+        setSubmitLoading(true)
         axios.put(`/api/update-task/${id}`, { name, description, assignedUsers }).then(response => {
             if (response.status === 200 && response.data.success === true) {
                 toast.success(response.data.msg)
             } else {
                 toast.error(response.data.msg)
             }
+            setSubmitLoading(false)
         }).catch(err => {
             if (err.response.status === 422) {
                 setErrors(err.response.data.errors)
             }
             console.log(err)
+            setSubmitLoading(false)
         })
     }
 
@@ -130,9 +135,9 @@ const EditTask = ({ loggedIn }) => {
                     </div>
                     <button
                         type="submit"
-                        className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                        className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center flex items-center"
                     >
-                        Update
+                        {submitLoading && <Spiner height="4" width="4" />}Update
                     </button>
                 </form>
             }
