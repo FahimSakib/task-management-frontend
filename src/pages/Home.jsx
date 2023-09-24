@@ -6,6 +6,7 @@ import PencilSquareIcon from "../components/icons/PencilSquareIcon"
 import TrashIcon from "../components/icons/TrashIcon"
 import DeleteConfirmModal from "../components/DeleteConfirmModal"
 import toast from "react-hot-toast"
+import Spiner from "../components/Spiner"
 
 export default function Home({ loggedIn }) {
     const [tasks, setTasks] = useState([])
@@ -80,6 +81,11 @@ export default function Home({ loggedIn }) {
         })
     }
 
+    const closeModal = () => {
+        setShowDeleteModal(false)
+        setIdForDelete('')
+    }
+
     const handlePagination = (url) => {
         const matches = url.match(/page=(\d+)/)
 
@@ -120,6 +126,9 @@ export default function Home({ loggedIn }) {
                         </tr>}
                     </tbody>
                 </table>
+                {(loading && rows?.length) && <div className="absolute top-[40px] left-0 w-full backdrop-blur-[1px] h-[90%] flex justify-center items-center">
+                    <Spiner />
+                </div>}
             </div>
             {tasks?.links &&
                 <div className="mt-5 ml-5">
@@ -133,7 +142,7 @@ export default function Home({ loggedIn }) {
                     ))}
                 </div>
             }
-            {showDeleteModal && <DeleteConfirmModal setShowDeleteModal={setShowDeleteModal} deleteTask={deleteTask} setIdForDelete={setIdForDelete} />}
+            {showDeleteModal && <DeleteConfirmModal deleteTask={deleteTask} closeModal={closeModal} />}
         </div>
     )
 }
