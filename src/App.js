@@ -11,6 +11,7 @@ import ViewTask from './pages/ViewTask';
 import EditTask from './pages/EditTask';
 import AccessDenied from './pages/AccessDenied';
 import { Toaster } from 'react-hot-toast';
+import AuthInterceptor from './AuthInterceptor';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(
@@ -23,6 +24,7 @@ function App() {
     sessionStorage.setItem('loggedIn', true);
   };
 
+  axios.interceptors.response.use(AuthInterceptor);
   axios.defaults.withCredentials = true;
   axios.defaults.baseURL = 'http://localhost:8000'
 
